@@ -19,7 +19,7 @@ contract ProofOfExistence is Pausable {
     }
 
     //events
-    event LogProof(string indexed fileHash, string filePath, uint timestamp, address indexed fileOwner);
+    event LogProof(string fileHash, string filePath, uint timestamp, address indexed fileOwner);
 
     //functions
     function kill() public onlyOwner {
