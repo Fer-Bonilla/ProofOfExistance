@@ -9,6 +9,7 @@ import './App.css'
 
 import Dropzone from 'react-dropzone'
 import IPFS from 'ipfs-api'
+import moment from 'moment';
 
 const node = IPFS('ipfs.infura.io', '5001', {protocol: 'https'})
 
@@ -23,6 +24,7 @@ class App extends Component {
       numFiles: 0,
       data: []
     }
+    this.onDrop = this.onDrop.bind(this);
   }
 
   componentWillMount() {
@@ -62,7 +64,7 @@ class App extends Component {
     this.state.web3.eth.getAccounts((error, accounts) => {
       ProofOfExistence.deployed().then((instance) => {
         ProofOfExistenceInstance = instance
-        console.log('instance: ', instance)
+        //console.log('instance: ', instance)
         // Get the number of uploaded files by the user
         return ProofOfExistenceInstance.getProofLength.call(accounts[0])
       }).then((result) => {
@@ -72,7 +74,7 @@ class App extends Component {
         for(var i=0; i< this.state.numFiles; i++){
           ProofOfExistenceInstance.getProofAt(accounts[0], i)
           .then((result) => {
-            console.log('results: ', result);
+            //console.log('results: ', result);
             var tempData = this.state.data;
             tempData.push({
               fileHash: result[0],
@@ -80,15 +82,16 @@ class App extends Component {
               timestamp: result[2].c[0],
               fileOwner: result[3]
             })
-            console.log('tempData: ', tempData)
+            //console.log('tempData: ', tempData)
             this.setState({data: tempData})
-            console.log('Data: ', this.state.data)
+            //console.log('Data: ', this.state.data)
           })
         }
 
       });
     });
   }
+
 
   onDrop(acceptedFiles, rejectedFiles) {
     acceptedFiles.forEach(file => {
@@ -115,7 +118,7 @@ class App extends Component {
               this.state.web3.eth.getAccounts((error, accounts) => {
               ProofOfExistence.deployed().then((instance) => {
                 ProofOfExistenceInstance = instance
-                console.log('instance: ', instance)
+                //console.log('instance: ', instance)
                 // Get the number of uploaded files by the user
                 return ProofOfExistenceInstance.addProof(filesAdded[0].hash, "https://ipfs.io/ipfs/" + filesAdded[0].hash, {from: accounts[0]})
                 }).then((result) => {
@@ -136,13 +139,13 @@ class App extends Component {
 
 
   render() {
-    var listItems = this.state.data.map(function(item) {
+    var listItems = this.state.data.map(function(item,index) {
       return (
-        <div className="file-metadata" key={item.fileHash}>
+        <div className="file-metadata" key={index}>
           <h3><u>File Metadata</u></h3>
           <p>IPFS Hash: {item.fileHash} </p>
-          <p>File Path: {item.filePath} </p>
-          <p>Timestamp: {item.timestamp} </p>
+          <p>File Path: <a href={item.filePath}>{item.filePath}</a>  </p>
+          <p>Timestamp: {moment.unix(item.timestamp).format('dddd, MMMM Do, YYYY h:mm:ss A')}</p>
           <p>File Owner: {item.fileOwner} </p>
         </div>
       );
