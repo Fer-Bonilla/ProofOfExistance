@@ -58,3 +58,25 @@ In this application the time-stamping of pictures/videos is done by `block.times
 There is absolutely no integer manipulation in the application which can trigger integer overflow or underflow attack.
 
 ### DoS with (unexpected) revert
+
+```js
+function addProof(string _fileHash, string _filePath) public whenNotPaused {
+        //string memory ipfsURL = "http://ipfs.io/ipfs/" + _fileHash; //Oraclize can be used
+
+        userProofs[msg.sender].push(proof({
+            fileHash: _fileHash,
+            filePath: _filePath,
+            timestamp: now,
+            fileOwner: msg.sender
+        }));
+
+        emit LogProof(_fileHash, _filePath, now, msg.sender);
+
+    }
+```
+
+There is no way a malicious user can halt the execution of above function forever for all other users. So, there is no DoS with revert attack possible.
+
+### DoS with block gas limit
+
+There are no loop over an array of unknown size which can trigger block out of gas exception. Again there is no function responsible for sending large number of transactions which might trigger block out of gas exception.
