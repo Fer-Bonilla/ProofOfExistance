@@ -1,5 +1,5 @@
 ## Design Patterns
-There are several design patterns implemented for the smart contract development of this application. Details about them is follows.
+There are several design patterns implemented for the smart contract development of this application. Details about them are follows.
 
 ### Fail early and fail loud
 
