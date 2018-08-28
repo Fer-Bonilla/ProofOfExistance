@@ -41,6 +41,8 @@ contract ProofOfExistence is Pausable {
     }
 
     function getProofAt(address _user, uint _index) public view returns(string, string, uint, address) {
+        require(_user != address(0), "Invalid user address");
+
         return(userProofs[_user][_index].fileHash,
         userProofs[_user][_index].filePath,
         userProofs[_user][_index].timestamp,
@@ -48,6 +50,8 @@ contract ProofOfExistence is Pausable {
     }
 
     function getProofLength(address _user) public view returns(uint) {
+        require(_user != address(0), "Invalid user address");
+        
         return(userProofs[_user].length);
     }
 
