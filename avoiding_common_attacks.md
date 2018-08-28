@@ -80,3 +80,9 @@ There is no way a malicious user can halt the execution of above function foreve
 ### DoS with block gas limit
 
 There are no loop over an array of unknown size which can trigger block out of gas exception. Again there is no function responsible for sending large number of transactions which might trigger block out of gas exception.
+
+### Forcibly Sending Ether to a Contract
+
+> It is possible to forcibly send Ether to a contract without triggering its fallback function.
+
+Since there are no business logic which deals with contract balance in the fallback function, there are no risk of forcibly sending ether to a contract attack.
