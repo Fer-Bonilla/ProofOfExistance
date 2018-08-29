@@ -24,7 +24,8 @@ class App extends Component {
       numFiles: 0,
       data: []
     }
-    this.onDrop = this.onDrop.bind(this);
+    //this.onDrop = this.onDrop.bind(this);
+    //this.instantiateContract = this.instantiateContract.bind(this);
   }
 
   componentWillMount() {
@@ -70,6 +71,7 @@ class App extends Component {
       }).then((result) => {
         // Update state with the result.
         this.setState({ numFiles: result.c[0] })
+        console.log('total files: ', this.state.numFiles);
 
         for(var i=0; i< this.state.numFiles; i++){
           ProofOfExistenceInstance.getProofAt(accounts[0], i)
@@ -123,6 +125,47 @@ class App extends Component {
                 return ProofOfExistenceInstance.addProof(filesAdded[0].hash, "https://ipfs.io/ipfs/" + filesAdded[0].hash, {from: accounts[0]})
                 }).then((result) => {
                   console.log('addProof: ', result);
+                  //this.forceUpdate();
+                  setTimeout(
+                  ()=>{
+                    ProofOfExistenceInstance.getProofLength.call(accounts[0])
+                    .then((result) => {
+                      this.setState({ numFiles: result.c[0] })
+                      console.log('total files after adding: ', this.state.numFiles);
+                      
+                      var tempData = [];
+                      for(var i=0; i< this.state.numFiles; i++){
+                        ProofOfExistenceInstance.getProofAt(accounts[0], i)
+                        .then((result) => {
+                          //console.log('results: ', result);
+                         
+                          tempData.push({
+                            fileHash: result[0],
+                            filePath: result[1],
+                            timestamp: result[2].c[0],
+                            fileOwner: result[3]
+                          })
+                          //console.log('tempData: ', tempData)
+                          this.setState({data: tempData})
+                          //console.log('Data: ', this.state.data)
+                        })
+                      };
+                      
+                    
+                  });
+
+                  
+
+                }
+                  ,10000);
+                  /*
+                  return ProofOfExistenceInstance.getProofLength.call(accounts[0])
+                  .then((result) => {
+                    this.setState({ numFiles: result.c[0] + 1 })
+                    console.log('total files after adding: ', this.state.numFiles);
+                    
+                  })*/
+
               })
             })
               
@@ -162,9 +205,12 @@ class App extends Component {
             <div className="pure-u-1-1">
               <h1>Upload any file for existence certification</h1>
               <h2>Number of files uploaded by you is: {this.state.numFiles}</h2>
-              <Dropzone onDrop={(files) => this.onDrop(files)}>
-                <div>Try dropping a file here, or click to select file to upload.</div>
-              </Dropzone>
+              
+              <div className="dropzone">
+                <Dropzone onDrop={this.onDrop.bind(this)}>
+                  <p>Try dropping some files here, or click to select files to upload.</p>
+                </Dropzone>
+              </div>
 
               <ul>
                 {listItems}
