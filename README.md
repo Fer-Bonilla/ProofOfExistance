@@ -38,4 +38,4 @@ Now, run the application using
 
 see the interface at [http://localhost:3000](http://localhost:3000/)
 
-**NOTE**: UI loader is not implemented so please wait for 2-3 minutes for transaction confirmation and then refresh the page to see updated smart contract state.
+**NOTE**: UI loader is not implemented so please wait for 2-3 minutes for transaction confirmation and to see the updated smart contract state.
