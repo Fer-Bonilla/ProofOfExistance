@@ -30,7 +30,8 @@ class App extends Component {
       web3: null,
       numFiles: 0,
       data: [],
-      loading: false
+      loading: false,
+      transactionHash: 'N/A'
     }
     //this.onDrop = this.onDrop.bind(this);
     //this.instantiateContract = this.instantiateContract.bind(this);
@@ -139,6 +140,7 @@ class App extends Component {
                 }).then((result) => {
                   console.log('addProof: ', result);
                   //this.forceUpdate();
+                  this.setState({transactionHash: result.receipt.transactionHash})
                   this.setState({loading: true});
 
                   setTimeout(
@@ -233,6 +235,7 @@ class App extends Component {
                 <Dropzone onDrop={this.onDrop.bind(this)}>
                   <p>Try dropping some files here, or click to select files to upload.</p>
                 </Dropzone>
+                <h3>Transaction Hash: {this.state.transactionHash}</h3>
               </div>
 
               <ul>
