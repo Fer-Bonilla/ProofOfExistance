@@ -10,9 +10,16 @@ import './App.css'
 import Dropzone from 'react-dropzone'
 import IPFS from 'ipfs-api'
 import moment from 'moment';
+import { css } from 'react-emotion';
+import ClipLoader from 'react-spinners/ClipLoader';
 
 const node = IPFS('ipfs.infura.io', '5001', {protocol: 'https'})
 
+const override = css`
+    display: block;
+    margin: 0 auto;
+    border-color: red;
+`;
 
 class App extends Component {
   constructor(props) {
@@ -22,13 +29,15 @@ class App extends Component {
       storageValue: 0,
       web3: null,
       numFiles: 0,
-      data: []
+      data: [],
+      loading: false
     }
     //this.onDrop = this.onDrop.bind(this);
     //this.instantiateContract = this.instantiateContract.bind(this);
   }
 
   componentWillMount() {
+    this.setState({loading: true});
     // Get network provider and web3 instance.
     // See utils/getWeb3 for more info.
 
@@ -44,6 +53,8 @@ class App extends Component {
     .catch(() => {
       console.log('Error finding web3.')
     })
+
+    this.setState({loading: false});
   }
 
   instantiateContract() {
@@ -101,11 +112,13 @@ class App extends Component {
       const reader = new FileReader();
         reader.onload = () => {
             const fileAsArrayBuffer = reader.result;
-            
+
+            this.setState({loading: true});
             node.files.add({
               path: file.name,
               content: Buffer.from(fileAsArrayBuffer)
             }, (err, filesAdded) => {
+              this.setState({loading: false});
               if (err) {console.log('ipfs error: ', err); return err}
       
               console.log('Added file: ', filesAdded[0].path, filesAdded[0].hash)
@@ -126,6 +139,8 @@ class App extends Component {
                 }).then((result) => {
                   console.log('addProof: ', result);
                   //this.forceUpdate();
+                  this.setState({loading: true});
+
                   setTimeout(
                   ()=>{
                     ProofOfExistenceInstance.getProofLength.call(accounts[0])
@@ -134,7 +149,8 @@ class App extends Component {
                       console.log('total files after adding: ', this.state.numFiles);
                       
                       var tempData = [];
-                      for(var i=0; i< this.state.numFiles; i++){
+                      var i = 0;
+                      for( i=0; i< this.state.numFiles; i++){
                         ProofOfExistenceInstance.getProofAt(accounts[0], i)
                         .then((result) => {
                           //console.log('results: ', result);
@@ -148,16 +164,17 @@ class App extends Component {
                           //console.log('tempData: ', tempData)
                           this.setState({data: tempData})
                           //console.log('Data: ', this.state.data)
+                          
                         })
                       };
-                      
+                      if(i === this.state.numFiles ) {this.setState({loading: false})};
                     
                   });
 
                   
 
                 }
-                  ,10000);
+                  ,7000);
                   /*
                   return ProofOfExistenceInstance.getProofLength.call(accounts[0])
                   .then((result) => {
@@ -205,7 +222,13 @@ class App extends Component {
             <div className="pure-u-1-1">
               <h1>Upload any file for existence certification</h1>
               <h2>Number of files uploaded by you is: {this.state.numFiles}</h2>
-              
+               <ClipLoader
+                className={override}
+                sizeUnit={"px"}
+                size={150}
+                color={'#123abc'}
+                loading={this.state.loading}
+              />
               <div className="dropzone">
                 <Dropzone onDrop={this.onDrop.bind(this)}>
                   <p>Try dropping some files here, or click to select files to upload.</p>
